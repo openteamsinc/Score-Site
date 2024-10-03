@@ -12,16 +12,34 @@ const debouncedFetchPackages = debounce(
     }
     setLoading(false);
   },
-  300,
-); // 300ms delay
+  150, // Reduced debounce delay from 300ms to 150ms for more responsiveness
+);
+
+const cache = new Map();
 
 export default function useSearchPackages(query: string) {
   const [packages, setPackages] = React.useState<PackageResult[]>([]);
   const [loading, setLoading] = React.useState<boolean>(false);
 
   React.useEffect(() => {
+    if (cache.has(query)) {
+      // If query is cached, use the cached result
+      setPackages(cache.get(query));
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
-    debouncedFetchPackages(query, setPackages, setLoading);
+    debouncedFetchPackages(
+      query,
+      (result: PackageResult[]) => {
+        // Explicitly type result as PackageResult[]
+        setPackages(result);
+        cache.set(query, result); // Cache the result for future queries
+      },
+      setLoading,
+    );
+
     return () => {
       debouncedFetchPackages.cancel();
     };
