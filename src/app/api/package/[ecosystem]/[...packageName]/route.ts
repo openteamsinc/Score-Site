@@ -14,15 +14,18 @@ type T = {
   maturity?: { notes?: string[] };
 };
 function replaceNoteIdWithTextCode(val: T, notes: Notes) {
+  console.log("replaceNoteIdWithTextCode", notes);
   if (val.health_risk?.notes != null) {
-    val.health_risk.notes = val.health_risk.notes.map(
-      (noteId) => notes[noteId].code || "Unknown",
-    );
+    val.health_risk.notes = val.health_risk.notes.map((noteId) => {
+      console.log("noteId", noteId);
+      return notes[noteId]?.code || "Unknown";
+    });
   }
   if (val.maturity?.notes != null) {
-    val.maturity.notes = val.maturity.notes.map(
-      (noteId) => notes[noteId].code || "Unknown",
-    );
+    val.maturity.notes = val.maturity.notes.map((noteId) => {
+      console.log("noteId", noteId);
+      return notes[noteId]?.code || "Unknown";
+    });
   }
 }
 
