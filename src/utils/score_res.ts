@@ -124,12 +124,15 @@ export type Notes = {
   };
 };
 
-export async function fetchNotes(): Promise<Notes> {
-  const url = `${BASE_URL}/notes`;
+export type NoteResponse = {
+  categories: string[];
+  groups: { [group: string]: string[] };
+  notes: Notes;
+};
+
+export async function fetchNotes(): Promise<NoteResponse> {
+  const url = `${BASE_URL}/notes/categories`;
   const res = await fetch(url);
-  const data: Notes = await res.json();
-  const notes = Object.fromEntries(
-    Object.entries(data).map(([, value]) => [value.code, value]),
-  );
-  return notes;
+  const data = await res.json();
+  return data;
 }
