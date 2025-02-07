@@ -1,37 +1,48 @@
 "use server";
 
-import { fetchAll } from "./database";
-import { HealthRiskValue, MaturityValue } from "./score";
+import searchPyPIPackages from "./search_pypi";
+import searchCondaForgePackages from "./search_conda";
+import searchNpmPackages from "./search_npm";
 
 export type PackageResult = {
   ecosystem: string;
   name: string;
-  health_risk: HealthRiskValue;
-  maturity: MaturityValue;
+  url: string;
+  version?: string;
 };
 
-export default async function search_packages(query: string) {
-  const sqlQuery = `
-SELECT DISTINCT
-    packages.ecosystem,
-    packages.name,
-    scores.health_risk.value AS health_risk,
-    scores.maturity.value AS maturity,
-    damerau_levenshtein(lower(name), lower(?::VARCHAR))::int AS name_distance
-FROM packages
-LEFT JOIN scores ON packages.source_url = scores.source_url
-ORDER BY
-    name_distance,
-    name
-LIMIT 10`;
-
-  try {
-    const results = await fetchAll<PackageResult>(sqlQuery, query);
-    console.log("results", results);
-    return results;
-  } catch (error) {
-    console.error("Error querying packages:", error);
-    // throw error;
-    return [];
+export default async function search_packages(
+  query: string,
+  ecosystem: string,
+): Promise<PackageResult[]> {
+  if (ecosystem === "pypi") {
+    const pypiResults = await searchPyPIPackages(query);
+    return pypiResults.map((pkg) => ({
+      ecosystem: "pypi",
+      name: pkg.name,
+      url: pkg.package_manager_url,
+    }));
   }
+
+  if (ecosystem === "conda") {
+    const condaResults = await searchCondaForgePackages(query);
+    return condaResults.map((pkg) => ({
+      ecosystem: "conda",
+      name: pkg.name,
+      version: pkg.latestVersion,
+      url: pkg.url,
+    }));
+  }
+
+  if (ecosystem === "npm") {
+    const npmResults = await searchNpmPackages(query);
+    return npmResults.objects.map(({ package: pkg }) => ({
+      ecosystem: "npm",
+      name: pkg.name,
+      version: pkg.version,
+      url: `https://registry.npmjs.org/${pkg.name}`,
+    }));
+  }
+
+  throw new Error(`Unsupported ecosystem: ${ecosystem}`);
 }

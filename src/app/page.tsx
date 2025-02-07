@@ -10,7 +10,7 @@ export default function Home() {
       <h1 className="my-8 text-center text-3xl font-bold">
         Welcome to OpenTeams • Open Source Scoring
       </h1>
-      <div className="mx-auto max-w-2xl">
+      <div className="mx-auto flex max-w-2xl">
         <SearchAutocomplete />
       </div>
       <div className="mt-12 text-center">

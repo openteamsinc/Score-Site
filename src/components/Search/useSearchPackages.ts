@@ -3,9 +3,9 @@ import search_packages, { PackageResult } from "@/utils/search_packages";
 import { debounce } from "lodash";
 
 const debouncedFetchPackages = debounce(
-  async (query, setPackages, setLoading) => {
+  async (query, ecosystem, setPackages, setLoading) => {
     if (query.trim().length >= 3) {
-      const results = await search_packages(query);
+      const results = await search_packages(query, ecosystem);
       setPackages(results);
     } else {
       setPackages([]);
@@ -15,17 +15,17 @@ const debouncedFetchPackages = debounce(
   300,
 ); // 300ms delay
 
-export default function useSearchPackages(query: string) {
+export default function useSearchPackages(query: string, ecosystem: string) {
   const [packages, setPackages] = React.useState<PackageResult[]>([]);
   const [loading, setLoading] = React.useState<boolean>(false);
 
   React.useEffect(() => {
     setLoading(true);
-    debouncedFetchPackages(query, setPackages, setLoading);
+    debouncedFetchPackages(query, ecosystem, setPackages, setLoading);
     return () => {
       debouncedFetchPackages.cancel();
     };
-  }, [query]);
+  }, [query, ecosystem]);
 
   return { packages, loading };
 }

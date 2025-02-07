@@ -1,5 +1,3 @@
-import { maturityColor, maturityIconPath } from "@/components/Maturity";
-import { riskColor, riskIconPath } from "@/components/Risk";
 import { PackageResult } from "@/utils/search_packages";
 import { ComboboxOption } from "@headlessui/react";
 import { mdiSearchWeb } from "@mdi/js";
@@ -27,24 +25,7 @@ export default function AutoCompleteOption({ item }: Props) {
           >
             {`${item.ecosystem}/${item.name}`}
           </span>
-          <div className="absolute inset-y-0 right-0 flex items-center space-x-2 pr-3">
-            <div
-              className={`bg- flex size-6 items-center justify-center rounded${riskColor(item.health_risk)}`}
-            >
-              <Icon
-                className={`size-4 text-white`}
-                path={riskIconPath(item.health_risk)}
-              />
-            </div>
-            <div
-              className={`flex size-6 items-center justify-center rounded ${maturityColor(item.maturity)}`}
-            >
-              <Icon
-                className="size-4 text-white"
-                path={maturityIconPath(item.maturity)}
-              />
-            </div>
-          </div>
+          <div className="absolute inset-y-0 right-0 flex items-center space-x-2 pr-3"></div>
           {selected ? (
             <span
               className={`absolute inset-y-0 left-0 flex items-center pl-3 ${
