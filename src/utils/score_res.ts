@@ -92,6 +92,14 @@ export type PackageScore =
   | {
       ecosystem: string;
       package_name: string;
+      status: "invalid_ecosystem";
+      package: Package;
+      source: null;
+      score: null;
+    }
+  | {
+      ecosystem: string;
+      package_name: string;
       status: "ok";
       package: Package;
       source: Source;
@@ -106,11 +114,20 @@ export async function fetchPackageScore(
   name: string,
 ): Promise<PackageScore> {
   const url = `${BASE_URL}/score/${ecosystem.toLowerCase()}/${name}`;
-  console.debug(url);
   const res = await fetch(url);
-  if (res.status != 200) {
-    throw new Error("Failed to fetch package score");
+
+  if (!res.ok) {
+    const err = await res.json();
+    return {
+      ecosystem,
+      package_name: name,
+      status: err.error,
+      package: {} as Package,
+      source: null,
+      score: null,
+    };
   }
+
   const data = await res.json();
   return data;
 }

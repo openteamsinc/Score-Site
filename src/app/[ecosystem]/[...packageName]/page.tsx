@@ -3,6 +3,7 @@ import React from "react";
 import { mdiAlert, mdiCircleSmall } from "@mdi/js";
 import Icon from "@mdi/react";
 import { notFound } from "next/navigation";
+import ErrorMessage from "@/components/ErrorMessage";
 
 import Risk from "@/components/Risk";
 import Maturity from "@/components/Maturity";
@@ -30,6 +31,11 @@ export default async function PackageScoreComponent({ params }: Props) {
 
   if (status === "not_found") {
     notFound();
+  }
+
+  if (status === "invalid_ecosystem") {
+    const message = `Ecosystem ${ecosystem} is not supported`;
+    return <ErrorMessage message={message} />;
   }
 
   return (
